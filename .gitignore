@@ -1,2 +1,3 @@
 org.ac-notify.notify.plist
 vendor/*
+src/ActiveCollabNotify/app/cache/*
