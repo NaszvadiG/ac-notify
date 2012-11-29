@@ -57,7 +57,8 @@ class GetActivitiesCommand extends Command
     public function sendToNotificationCenter($item) {
       $command = '/Applications/terminal-notifier.app/Contents/MacOS/terminal-notifier';
       $command .= ' -title \'activeCollab Notify\'';
-      $command .= ' -message \'' . $item['title'] . '\'';
+      $command .= ' -subtitle \'' . $item['title'] . '\'';
+      $command .= ' -message \'' . $item['message'] . '\'';
       $command .= ' -open \'' . $item['permalink'] . '\'';
       $command .= ' -group 139';
       $ret = exec($command);
@@ -116,6 +117,7 @@ class GetActivitiesCommand extends Command
         $feedItem['permalink'] = $item->get_permalink();
         $feedItem['title'] = $item->get_title();
         $feedItem['date'] = $item->get_date('U');
+        $feedItem['message'] = addslashes($item->get_content());
         $newItems[$id] = $feedItem;
         $savedItems[$id] = $feedItem;
       }
