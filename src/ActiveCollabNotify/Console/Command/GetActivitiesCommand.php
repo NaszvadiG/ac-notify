@@ -55,9 +55,10 @@ class GetActivitiesCommand extends Command
      * @param array $item
      */
     public function sendToNotificationCenter($item) {
-      $command = '/Applications/terminal-notifier.app/Contents/MacOS/terminal-notifier';
+      $projectRoot = dirname(dirname(dirname(dirname(__DIR__))));
+      $command = $projectRoot . '/vendor/alloy/terminal-notifier/terminal-notifier.app/Contents/MacOS/terminal-notifier';
       $command .= ' -title \'activeCollab Notify\'';
-      $command .= ' -subtitle \'' . $item['title'] . '\'';
+      $command .= ' -message \'' . $item['title'] . '\'';
       // $command .= ' -message \'' . $item['message'] . '\'';
       $command .= ' -open \'' . $item['permalink'] . '\'';
       $command .= ' -group 139';
