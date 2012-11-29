@@ -1,0 +1,27 @@
+{
+  "repositories": [
+    {
+        "type": "package",
+        "package": {
+          "name": "alloy/terminal-notifier",
+          "version": "1.4.2",
+          "dist": {
+            "url": "https://github.com/downloads/alloy/terminal-notifier/terminal-notifier_1.4.2.zip",
+            "type": "zip"
+          }
+        }
+    }
+  ],
+  "require": {
+      "symfony/console": "2.*",
+      "symfony/yaml": "2.*",
+      "symfony/filesystem": "2.*",
+      "symfony/process": "2.*",
+      "simplepie/simplepie": "dev-one-dot-three",
+      "alloy/terminal-notifier": "1.4.2"
+  },
+  "autoload": {
+      "psr-0": { "ActiveCollabNotify": "src/" }
+  },
+  "bin": ["ac-notify"]
+}
