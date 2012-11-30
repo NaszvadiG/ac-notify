@@ -42,8 +42,8 @@ class ActiveCollabNotify
    * @param array $data
    * @param string $bin
    */
-  private function cacheSet($data, $bin) {
-    $file = __DIR__ . '/app/cache/' . $bin . '.yml';
+  public function cacheSet($data, $bin) {
+    $file = $this->getCacheDir() . '/' . $bin . '.yml';
     $dumper = new Dumper();
     // Convert any objects to arrays.
     $json  = json_encode($data);
@@ -57,10 +57,10 @@ class ActiveCollabNotify
    *
    * @param string $bin
    */
-  private function cacheGet($bin) {
+  public function cacheGet($bin) {
     $yaml = new Parser();
     $fs = new Filesystem();
-    $file = $this->getCacheDir . $bin . '.yml';
+    $file = $this->getCacheDir() . '/' . $bin . '.yml';
     if (!$fs->exists($file)) {
       $fs->touch($file);
     }

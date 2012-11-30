@@ -55,10 +55,17 @@ class GetActivitiesCommand extends Command
      *
      * @param array $items
      */
-    public function filterItem(&$items) {
+    public function filterItems(&$items) {
       // Get array of strings to exclude.
-      foreach ($items as $item) {
-        print_r($item);
+      $excludes = $this->acNotify->getExcludes();
+      if (count($excludes)) {
+        foreach ($items as $key => $item) {
+          foreach ($excludes as $exclude) {
+            if (strpos($item['title'], $exclude)) {
+              unset($items[$key]);
+            }
+          }
+        }
       }
     }
 
@@ -117,6 +124,8 @@ class GetActivitiesCommand extends Command
         }
       }
 
+      $savedItems = $this->acNotify->cacheGet('feed_items');
+
       $feedData = array();
       foreach ($feed->get_items() as $item) {
         if ($item->get_date('U') < $expireDate)
@@ -147,7 +156,7 @@ class GetActivitiesCommand extends Command
 
       uasort($savedItems, array('self', 'customSort'));
 
-      file_put_contents($cacheDir . '/feed_items.php', serialize($savedItems));
+      $this->acNotify->cacheSet($savedItems, 'feed_items');
 
       return array_slice($newItems, 0, $items);
     }
