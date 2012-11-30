@@ -43,10 +43,23 @@ class GetActivitiesCommand extends Command
     {
         $items = $this->getRecentActivities(FALSE, 5);
         if ($items) {
+          $this->filterItems($items);
           foreach ($items as $item) {
             $notify = $this->sendToNotificationCenter($item);
           }
         }
+    }
+
+    /**
+     * Filters items based on exclusion criteria defined by user.
+     *
+     * @param array $items
+     */
+    public function filterItem(&$items) {
+      // Get array of strings to exclude.
+      foreach ($items as $item) {
+        print_r($item);
+      }
     }
 
     /**
@@ -61,7 +74,7 @@ class GetActivitiesCommand extends Command
       $command .= ' -message \'' . $item['title'] . '\'';
       // $command .= ' -message \'' . $item['message'] . '\'';
       $command .= ' -open \'' . $item['permalink'] . '\'';
-      $command .= ' -group 139';
+      $command .= ' -group \'org.ac-notify.notify\'';
       $ret = exec($command);
       sleep(3);
     }
@@ -87,7 +100,7 @@ class GetActivitiesCommand extends Command
       $numberOfDaysInSeconds = ($numberOfDays*24*60*60);
       $expireDate = time() - $numberOfDaysInSeconds;
 
-      $rss = $this->acNotify->rss;
+      $rss = $this->acNotify->getRss();
       $cacheDir = $this->acNotify->getCacheDir();
       $feed->set_feed_url($rss);
       $feed->enable_cache(FALSE);

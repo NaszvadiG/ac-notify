@@ -28,7 +28,7 @@ class ActiveCollabNotify
   public function __construct()
   {
     if (!$this->checkRequirements()) {
-      return false;
+      return FALSE;
     }
   }
 
@@ -74,27 +74,37 @@ class ActiveCollabNotify
    */
   public function checkRequirements()
   {
-    $currentUser = get_current_user();
-    $fs = new Filesystem();
-    $configFile = '/Users/' . $currentUser . '/.active_collab';
+      $fs = new Filesystem();
+      $configFile = __DIR__ . '/app/config/settings.yml';
 
-    if (!$fs->exists($configFile)) {
-      print "Please create a ~/.active_collab file.\n";
-      return false;
-    }
+      if (!$fs->exists($configFile)) {
+        $fs->touch($configFile);
+        if (!$fs->exists($configFile)) {
+          printf("Unable to create config file: %s", $configFile);
+          return FALSE;
+        } else {
+          $dumper = new Dumper();
+          $default = array('rss' => '', 'exclude' => '');
+          $yaml = $dumper->dump($default, 2);
+          file_put_contents($configFile, $yaml);
+        }
+      }
 
-    $yaml = new Parser();
+      $yaml = new Parser();
 
-    try {
+      try {
         $file = $yaml->parse(file_get_contents($configFile));
-        if (isset($file['rss'])) {
+        if (isset($file['exclude']) && !empty($file['exclude'])) {
+            $this->exclude = $file['exclude'];
+        }
+        if (isset($file['rss']) && !empty($file['rss'])) {
           $this->rss = $file['rss'];
         } else {
-          print "Please specify the RSS feed for fetching updates.";
+          return FALSE;
         }
-    } catch (ParseException $e) {
-        printf("Unable to parse the YAML string: %s", $e->getMessage());
-        return false;
+      } catch (ParseException $e) {
+          printf("Unable to parse the YAML string: %s", $e->getMessage());
+          return false;
     }
 
     // Create cache directory.
@@ -103,6 +113,42 @@ class ActiveCollabNotify
     }
 
     return true;
+  }
+
+  public function getConfigFile() {
+    return __DIR__ . '/app/config/settings.yml';
+  }
+
+  public function getExcludes() {
+    $config = $this->getConfig();
+    return $config['excludes'];
+  }
+
+  public function getRss() {
+    $config = $this->getConfig();
+    return $config['rss'];
+  }
+
+  public function getConfig() {
+      $yaml = new Parser();
+      return $yaml->parse(file_get_contents($this->getConfigFile()));
+  }
+
+  public function setConfig($bin, $data) {
+    $yaml = new Parser();
+    $file = $yaml->parse(file_get_contents($this->getConfigFile()));
+    $file[$bin] = $data;
+    $dumper = new Dumper();
+    $yaml = $dumper->dump($file, 2);
+    file_put_contents($this->getConfigFile(), $yaml);
+  }
+
+  public function setRss($rss) {
+    $this->setConfig('rss', $rss);
+  }
+
+  public function setExcludes($excludes) {
+    $this->setConfig('excludes', $excludes);
   }
 
   /**

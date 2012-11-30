@@ -5,6 +5,7 @@ namespace ActiveCollabNotify\Console;
 use Symfony\Component\Console\Application as BaseApplication;
 use ActiveCollabNotify\Console\Command\ServiceCommand;
 use ActiveCollabNotify\Console\Command\GetActivitiesCommand;
+use ActiveCollabNotify\Console\Command\ConfigCommand;
 use ActiveCollabNotify\ActiveCollabNotify;
 
 /**
@@ -19,8 +20,12 @@ class Application extends BaseApplication
     {
         error_reporting(-1);
         parent::__construct('ActiveCollab Notify', ActiveCollabNotify::VERSION);
-        $this->add(new ServiceCommand());
-        $this->add(new GetActivitiesCommand());
+        $this->acNotify = new ActiveCollabNotify();
+        if (!empty($this->acNotify->rss)) {
+            $this->add(new ServiceCommand());
+            $this->add(new GetActivitiesCommand());
+        }
+        $this->add(new ConfigCommand());
     }
 
     /**
